@@ -3,524 +3,827 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#080707">
+  <meta name="theme-color" content="#1a0d10">
   <meta name="description" content="DON'T LET THEM KNOW is a multiplayer social-chaos game about secret objectives, uneasy alliances, and survival.">
-  <title>DONT LET THEM KNOW</title>
+  <title>DON'T LET THEM KNOW — Desktop</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script>document.documentElement.classList.add("js");</script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: dark;
-      --ink: #080707;
-      --paper: #eadfdf;
-      --acid: #ff3434;
-      --coral: #b51f2b;
-      --text-size: 12px;
-      --mono: "IBM Plex Mono", monospace;
+      --wall: #1a0d10;
+      --wall-deep: #10090b;
+      --surface: #26191d;
+      --surface-raised: #342126;
+      --line: rgba(247, 228, 231, .12);
+      --text: #f4e9ea;
+      --muted: #b39b9f;
+      --lime: #ff596c;
+      --orange: #e9858c;
+      --blue: #bd7180;
+      --sans: "DM Mono", monospace;
+      --mono: "DM Mono", monospace;
     }
 
     * { box-sizing: border-box; }
 
-    html { scroll-behavior: smooth; }
-
     body {
+      min-width: 320px;
+      min-height: 100vh;
       margin: 0;
-      background: #050404;
-      color: var(--paper);
-      font-family: var(--mono);
-      font-size: var(--text-size);
+      overflow: hidden;
+      background: var(--wall);
+      color: var(--text);
+      font-family: var(--sans);
     }
 
-    a { color: inherit; }
+    button, a { color: inherit; font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+    svg { display: none; }
 
-    .page {
-      min-height: 100svh;
+    .desktop {
       position: relative;
-      min-height: 100svh;
-      background:
-        repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,52,52,.025) 4px),
-        radial-gradient(ellipse at 50% 0, rgba(90,12,16,.17), transparent 56%),
-        #080707;
-    }
-
-    .frame {
-      width: min(100% - 48px, 1160px);
-      min-height: calc(100svh - 100px);
-      margin: 76px auto 24px;
-      padding: 0 34px;
-      border: 1px solid rgba(255,52,52,.42);
-      background: rgba(7,6,6,.92);
-      box-shadow: 0 0 48px rgba(160,14,22,.1), inset 0 0 40px rgba(150,20,25,.025);
       display: flex;
+      min-height: 100vh;
       flex-direction: column;
+      isolation: isolate;
+      overflow: hidden;
+      background:
+        linear-gradient(133deg, transparent 0 47%, rgba(201, 242, 122, .045) 47.1% 47.35%, transparent 47.45%),
+        linear-gradient(133deg, transparent 0 57%, rgba(201, 242, 122, .035) 57.1% 57.3%, transparent 57.4%),
+        radial-gradient(ellipse at 69% 48%, rgba(63, 96, 67, .5), transparent 49%),
+        linear-gradient(120deg, #18231d, #101613 72%);
     }
 
-    .topbar {
-      position: fixed;
-      z-index: 20;
-      inset: 0 0 auto;
+    .desktop::before, .desktop::after {
+      position: absolute;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+    }
+
+    .desktop::before {
+      width: min(58vw, 720px);
+      aspect-ratio: 1;
+      top: 12%;
+      right: -10%;
+      border: 1px solid rgba(201, 242, 122, .13);
+      border-radius: 47% 53% 58% 42% / 42% 44% 56% 58%;
+      box-shadow: 0 0 0 48px rgba(201, 242, 122, .018), 0 0 0 98px rgba(201, 242, 122, .014);
+      transform: rotate(-24deg);
+    }
+
+    .desktop::after {
+      inset: 0;
+      opacity: .22;
+      background-image: radial-gradient(rgba(239, 245, 228, .22) .6px, transparent .6px);
+      background-size: 5px 5px;
+      mask-image: linear-gradient(115deg, #000, transparent 48%);
+    }
+
+    .system-bar {
+      position: relative;
+      z-index: 10;
       display: grid;
+      height: 42px;
+      flex: 0 0 42px;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 24px;
-      min-height: 52px;
-      padding: 0 max(24px, calc((100vw - 1092px) / 2));
-      border-bottom: 1px solid rgba(255,52,52,.45);
-      background: rgba(8,7,7,.97);
-      box-shadow: 0 8px 24px rgba(0,0,0,.45);
+      padding: 0 18px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: rgba(13, 17, 14, .76);
+      backdrop-filter: blur(18px);
+      font-size: 12px;
     }
 
-    .status-item { white-space: nowrap; }
-    .status-time { display: flex; flex-direction: column; gap: 2px; }
-    .sleep-message { color: var(--coral); }
-    .sleep-message[hidden] { display: none; }
-    .status-time { color: var(--acid); }
-    .status-progress { justify-self: center; }
-    .status-copyright { justify-self: end; color: rgba(240,239,231,.6); }
+    .bar-left, .bar-right, .bar-app { display: flex; align-items: center; }
+    .bar-left { gap: 9px; }
+    .bar-app { gap: 8px; color: #e5e9df; font-weight: 600; }
+    .bar-right { justify-self: end; gap: 15px; color: #d3dacf; }
+    .bar-button, .tray-button {
+      display: inline-grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #e3eadf;
+    }
+    .bar-button:hover, .tray-button:hover { background: rgba(255,255,255,.1); }
+    .bar-clock { font-variant-numeric: tabular-nums; }
+    .bar-brand { color: var(--lime); font-size: 13px; font-weight: 700; }
+    .bar-button svg { width: 14px; height: 14px; }
+    .bar-title { color: #e8ede3; }
+    .tray { display: flex; align-items: center; gap: 5px; }
+    .tray-button { width: 24px; height: 26px; color: #ccd5c8; }
 
-    main {
-      flex: 1;
+    .work-area { position: relative; flex: 1; min-height: 0; }
+
+    .desktop-icons {
+      position: absolute;
+      z-index: 1;
+      top: 25px;
+      left: 19px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(220px, .55fr);
-      align-items: center;
-      gap: 7%;
-      padding: 12vh 0 14vh;
+      width: 86px;
+      gap: 10px;
     }
 
-    .hero-copy { max-width: 790px; }
+    .desktop-icon {
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      min-height: 80px;
+      padding: 7px 3px 5px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #eff3e9;
+      text-align: center;
+      text-shadow: 0 1px 5px #101510;
+    }
+    .desktop-icon:hover, .desktop-icon:focus-visible { border-color: rgba(223, 237, 209, .19); background: rgba(236, 242, 225, .09); }
+    .desktop-icon span:last-child { max-width: 78px; font-size: 11px; line-height: 1.25; }
 
-    .eyebrow {
+    .app-glyph {
+      display: grid;
+      width: 39px;
+      height: 39px;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 11px;
+      background: linear-gradient(145deg, #515c4f, #27322a);
+      box-shadow: 0 5px 13px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.16);
+      color: #e7f4d0;
+      text-shadow: none;
+    }
+    .app-glyph.lime { background: linear-gradient(145deg, #d3f68c, #86ae4d); color: #23311c; }
+    .app-glyph.orange { background: linear-gradient(145deg, #f7be8a, #bd7143); color: #382217; }
+    .app-glyph.blue { background: linear-gradient(145deg, #a5ddd2, #558f86); color: #19332f; }
+    .app-glyph svg, .bar-app svg, .tray svg, .dock-item svg, .window-control svg, .menu-item svg { width: 19px; height: 19px; }
+
+    .app-window {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      left: 50%;
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 25px 4px;
-      color: var(--acid);
-      font-size: var(--text-size);
-      letter-spacing: .03em;
-      text-transform: uppercase;
-      animation: settle-in .7s .1s ease-out both;
+      width: min(1030px, calc(100% - 158px));
+      height: min(700px, calc(100% - 76px));
+      min-height: 390px;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(240, 245, 235, .16);
+      border-radius: 12px;
+      background: #202722;
+      box-shadow: 0 28px 90px rgba(0,0,0,.5), 0 3px 12px rgba(0,0,0,.25), inset 0 1px rgba(255,255,255,.05);
+      transform: translate(-50%, -50%);
+      transition: width .2s ease, height .2s ease, border-radius .2s ease, opacity .18s ease;
+      animation: window-arrive .55s cubic-bezier(.18,.75,.22,1) both;
     }
+    .app-window.is-maximized { top: 8px; right: 11px; bottom: 81px; left: 11px; width: auto; height: auto; transform: none; border-radius: 8px; }
+    .app-window.is-hidden { display: none; }
 
-    .eyebrow::before {
-      content: "";
-      width: 18px;
-      height: 1px;
-      background: var(--acid);
-    }
-
-    h1 {
-      max-width: 760px;
-      margin: 0;
-      font-family: var(--mono);
-      font-size: var(--text-size);
-      font-weight: 600;
-      letter-spacing: 0;
-      line-height: 1;
-      animation: title-in .8s .12s cubic-bezier(.2,.75,.2,1) both;
-    }
-
-    .ascii-logo {
-      margin: 0;
-      color: var(--acid);
-      font: inherit;
-      letter-spacing: 0;
-      line-height: 1.25;
-      white-space: pre;
-    }
-
-    .summary {
-      max-width: 560px;
-      margin: 35px 0 0 5px;
-      color: rgba(240,239,231,.76);
-      font-size: var(--text-size);
-      line-height: 1.9;
-      animation: settle-in .7s .28s ease-out both;
-    }
-
-    .actions {
+    .window-titlebar {
       display: flex;
-      align-items: center;
-      gap: 22px;
-      margin: 28px 0 0 5px;
-      animation: settle-in .7s .4s ease-out both;
-    }
-
-    .open-file {
-      min-height: 42px;
-      padding: 0 14px;
-      border: 1px solid var(--acid);
-      background: rgba(255,52,52,.08);
-      color: var(--acid);
-      font: 500 var(--text-size) var(--mono);
-      letter-spacing: .02em;
-      cursor: pointer;
-      transition: background .2s ease, color .2s ease, transform .2s ease;
-    }
-
-    .open-file:hover {
-      transform: translateY(-2px);
-      background: rgba(255,52,52,.18);
-    }
-
-    .install-link {
-      display: inline-flex;
-      min-height: 42px;
-      align-items: center;
-      padding: 0 14px;
-      border: 1px solid rgba(255,52,52,.45);
-      color: var(--paper);
-      font: 500 var(--text-size) var(--mono);
-      text-decoration: none;
-      transition: border-color .2s ease, background .2s ease, transform .2s ease;
-    }
-
-    .install-link:hover {
-      transform: translateY(-2px);
-      border-color: var(--acid);
-      background: rgba(255,52,52,.12);
-    }
-
-    .open-file:focus-visible, .install-link:focus-visible, .nav a:focus-visible, .dismiss:focus-visible {
-      outline: 2px solid var(--paper);
-      outline-offset: 4px;
-    }
-
-    .action-note {
-      color: rgba(240,239,231,.54);
-      font-size: var(--text-size);
-      letter-spacing: .08em;
-      text-transform: uppercase;
-    }
-
-    .readout {
-      align-self: end;
-      justify-self: end;
-      width: min(100%, 290px);
-      margin-bottom: 14px;
-      border-left: 1px solid rgba(229,57,53,.7);
-      padding: 12px 14px;
-      background: rgba(255,52,52,.035);
-      animation: settle-in .8s .5s ease-out both;
-    }
-
-    .readout-label, .readout-value { font-size: var(--text-size); letter-spacing: .02em; }
-    .readout-label { color: rgba(240,239,231,.54); }
-    .readout-value { margin-top: 9px; color: var(--acid); }
-    .readout p { margin: 12px 0 0; color: rgba(240,239,231,.72); font-size: var(--text-size); line-height: 1.8; }
-
-    .briefing {
-      padding: 110px 0 130px;
-      border-top: 1px solid rgba(255,52,52,.35);
-    }
-
-    .briefing-head {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(220px, .42fr);
-      gap: 8%;
-      align-items: end;
-      margin-bottom: 54px;
-    }
-
-    .section-kicker {
-      margin: 0 0 14px;
-      color: var(--coral);
-      font-size: var(--text-size);
-      letter-spacing: .15em;
-      text-transform: uppercase;
-    }
-
-    .briefing h2 {
-      max-width: 780px;
-      margin: 0;
-      font: 600 var(--text-size)/1.15 var(--mono);
-      letter-spacing: -.07em;
-    }
-
-    .briefing-intro {
-      margin: 0;
-      color: rgba(240,239,231,.68);
-      font-size: var(--text-size);
-      line-height: 1.9;
-    }
-
-    .briefing-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: rgba(255,52,52,.3);
-      border: 1px solid rgba(255,52,52,.3);
-    }
-
-    .briefing-card {
-      min-height: 210px;
-      padding: 24px;
-      background: #0b0808;
-    }
-
-    .briefing-card strong {
-      display: block;
-      margin-bottom: 20px;
-      color: var(--acid);
-      font-size: var(--text-size);
-      letter-spacing: .02em;
-    }
-
-    .briefing-card h3 {
-      margin: 0 0 14px;
-      font: 500 var(--text-size)/1.25 var(--mono);
-      letter-spacing: -.04em;
-    }
-
-    .briefing-card p, .briefing-card li {
-      color: rgba(240,239,231,.68);
-      font-size: var(--text-size);
-      line-height: 1.8;
-    }
-
-    .briefing-card p { margin: 0; }
-    .briefing-card ul { margin: 0; padding-left: 16px; }
-
-    .modes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8%;
-      margin-top: 56px;
-    }
-
-    .modes h3 { margin: 0 0 18px; color: var(--coral); font-size: var(--text-size); letter-spacing: .02em; }
-    .modes p { max-width: 490px; margin: 0; color: rgba(240,239,231,.72); font-size: var(--text-size); line-height: 1.9; }
-
-    .footer {
-      display: flex;
+      height: 44px;
+      flex: 0 0 44px;
       align-items: center;
       justify-content: space-between;
-      min-height: 62px;
-      border-top: 1px solid rgba(255,52,52,.35);
-      color: rgba(240,239,231,.52);
-      font-size: var(--text-size);
-      letter-spacing: .08em;
-      letter-spacing: .02em;
+      padding: 0 13px 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: #252d27;
+      user-select: none;
+      touch-action: none;
     }
-
-    .footer a { color: inherit; text-decoration-color: var(--coral); text-underline-offset: 4px; }
-
-    .copyright {
-      padding: 14px 0 18px;
-      border-top: 1px solid rgba(255,52,52,.18);
-      color: rgba(240,239,231,.4);
-      font-size: var(--text-size);
-      text-align: center;
-    }
-
-    dialog {
-      width: min(480px, calc(100% - 32px));
+    .window-name { display: flex; align-items: center; gap: 9px; color: #e8ece3; font-size: 12px; font-weight: 500; }
+    .window-name .app-glyph { width: 24px; height: 24px; border-radius: 7px; box-shadow: none; }
+    .window-name .app-glyph svg { width: 14px; height: 14px; }
+    .window-controls { display: flex; gap: 8px; }
+    .window-control {
+      display: grid;
+      width: 27px;
+      height: 27px;
+      place-items: center;
       padding: 0;
-      border: 1px solid rgba(229,57,53,.62);
-      background: #0b0808;
-      color: var(--paper);
-      box-shadow: 0 24px 100px rgba(0,0,0,.65);
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: #bdc6ba;
     }
+    .window-control:hover { border-color: var(--line); background: rgba(255,255,255,.06); color: white; }
+    .window-control.close:hover { border-color: #d36b58; background: #b94d3e; color: white; }
+    .window-control svg { width: 13px; height: 13px; }
 
-    dialog::backdrop { background: rgba(5,6,5,.78); backdrop-filter: blur(4px); }
-
-    .file-content { padding: 30px; }
-    .file-top { display: flex; align-items: center; justify-content: space-between; color: var(--acid); font-size: var(--text-size); letter-spacing: .02em; }
-    .file-stamp { border: 1px solid var(--coral); padding: 6px 8px; color: var(--coral); }
-    .file-content h2 { margin: 40px 0 14px; font: 500 var(--text-size)/1.2 var(--mono); }
-    .file-content p { max-width: 340px; color: rgba(240,239,231,.72); font-size: var(--text-size); line-height: 1.9; }
-    .dismiss { margin-top: 18px; padding: 11px 0; border: 0; background: none; color: var(--acid); font: 500 var(--text-size) var(--mono); letter-spacing: .02em; cursor: pointer; }
-
-    @keyframes settle-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes title-in { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 50% { opacity: .4; box-shadow: 0 0 3px rgba(229,57,53,.3); } }
-
-    .js .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity .8s ease, transform .8s cubic-bezier(.2,.75,.2,1);
+    .window-body { display: grid; min-height: 0; flex: 1; grid-template-columns: 190px minmax(0, 1fr); }
+    .app-sidebar {
+      display: flex;
+      min-height: 0;
+      flex-direction: column;
+      padding: 19px 11px 13px;
+      border-right: 1px solid var(--line);
+      background: #1c231e;
     }
-
-    .js .reveal.is-visible {
-      opacity: 1;
-      transform: translateY(0);
+    .sidebar-label { margin: 0 9px 11px; color: #869187; font: 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .app-nav { display: grid; gap: 3px; }
+    .nav-item {
+      display: flex;
+      min-height: 39px;
+      align-items: center;
+      gap: 11px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #adb7aa;
+      text-align: left;
+      font-size: 12px;
+      transition: background .16s ease, color .16s ease;
     }
+    .nav-item svg { width: 17px; height: 17px; color: #9baa98; }
+    .nav-item:hover { background: rgba(255,255,255,.055); color: #f3f5ed; }
+    .nav-item[aria-current="page"] { background: rgba(201,242,122,.12); color: var(--lime); }
+    .nav-item[aria-current="page"] svg { color: var(--lime); }
+    .sidebar-bottom { margin-top: auto; padding: 11px 9px 0; border-top: 1px solid var(--line); color: #839084; font: 10px/1.7 var(--mono); }
+    .sidebar-bottom span { color: var(--lime); }
 
-    .js .briefing-grid .reveal:nth-child(2) { transition-delay: .12s; }
-    .js .briefing-grid .reveal:nth-child(3) { transition-delay: .24s; }
+    .app-content { min-width: 0; min-height: 0; overflow: auto; background: #202722; scrollbar-color: #536051 transparent; scrollbar-width: thin; }
+    .view { display: none; min-height: 100%; padding: clamp(22px, 4vw, 43px); animation: view-in .25s ease both; }
+    .view.is-active { display: block; }
+    .view-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 27px; }
+    .eyebrow { margin: 0 0 10px; color: var(--lime); font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 510px; margin-bottom: 15px; font-size: clamp(34px, 4.3vw, 59px); font-weight: 600; letter-spacing: 0; line-height: .99; }
+    h1 span { color: var(--lime); }
+    h2 { margin-bottom: 10px; font-size: 20px; font-weight: 600; line-height: 1.15; }
+    h3 { margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+    .lead { max-width: 510px; margin-bottom: 23px; color: #b2bcb0; font-size: 14px; line-height: 1.7; }
+    .micro-label { color: #99a398; font: 10px var(--mono); letter-spacing: .055em; text-transform: uppercase; }
+    .build-pill, .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 9px;
+      border: 1px solid rgba(242,164,111,.24);
+      border-radius: 5px;
+      background: rgba(242,164,111,.08);
+      color: #f2b183;
+      font: 10px var(--mono);
+      white-space: nowrap;
+    }
+    .build-pill::before { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); content: ""; }
+    .overview-hero { display: grid; min-height: 262px; grid-template-columns: minmax(0, 1.1fr) minmax(210px, .9fr); align-items: center; gap: 25px; }
+    .hero-visual {
+      position: relative;
+      display: grid;
+      min-height: 230px;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(225,240,216,.11);
+      border-radius: 9px;
+      background:
+        linear-gradient(rgba(233,242,223,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(233,242,223,.035) 1px, transparent 1px),
+        radial-gradient(ellipse at 52% 58%, rgba(130,164,98,.23), transparent 57%),
+        #1b221d;
+      background-size: 24px 24px, 24px 24px, auto, auto;
+    }
+    .hero-visual::before, .hero-visual::after { position: absolute; border: 1px solid rgba(201,242,122,.2); content: ""; transform: rotate(45deg); }
+    .hero-visual::before { width: 183px; height: 183px; border-radius: 34px; }
+    .hero-visual::after { width: 132px; height: 132px; border-radius: 24px; }
+    .studio-card {
+      position: relative;
+      z-index: 1;
+      width: 68%;
+      min-height: 108px;
+      padding: 14px;
+      border: 1px solid rgba(239,244,230,.24);
+      border-radius: 7px;
+      background: rgba(37,48,40,.93);
+      box-shadow: 0 15px 35px rgba(0,0,0,.3);
+      transform: rotate(-4deg);
+    }
+    .studio-screen { display: grid; min-height: 62px; place-items: center; margin-bottom: 9px; border: 1px solid rgba(201,242,122,.2); background: #202b22; color: var(--lime); font: 10px var(--mono); letter-spacing: .14em; }
+    .studio-caption { display: flex; align-items: center; justify-content: space-between; color: #a4b09f; font: 9px var(--mono); text-transform: uppercase; }
+    .studio-caption span:last-child { color: var(--orange); }
+    .window-label { position: absolute; right: 12px; bottom: 11px; color: #9daa97; font: 9px var(--mono); }
+
+    .feature-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; margin-top: 13px; }
+    .feature-tile { min-height: 126px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; background: #252d27; }
+    .tile-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .tile-icon { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 7px; background: rgba(201,242,122,.1); color: var(--lime); }
+    .tile-icon.orange { background: rgba(242,164,111,.1); color: var(--orange); }
+    .tile-icon.blue { background: rgba(140,201,192,.1); color: var(--blue); }
+    .tile-icon svg { width: 16px; height: 16px; }
+    .tile-index { color: #849084; font: 10px var(--mono); }
+    .feature-tile h3 { margin-bottom: 6px; font-size: 13px; }
+    .feature-tile p { margin: 0; color: #a7b1a5; font-size: 11px; line-height: 1.5; }
+    .overview-footer { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 22px; padding-top: 17px; border-top: 1px solid var(--line); }
+    .player-note { color: #a3aea0; font: 10px var(--mono); }
+    .player-note strong { color: var(--lime); font-weight: 400; }
+    .primary-link, .quiet-link {
+      display: inline-flex;
+      min-height: 38px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 13px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background .15s ease, transform .15s ease;
+    }
+    .primary-link { background: var(--lime); color: #1e2919; }
+    .primary-link:hover { transform: translateY(-1px); background: #dbffa0; }
+    .primary-link svg, .quiet-link svg { width: 15px; height: 15px; }
+
+    .section-copy { max-width: 580px; margin-bottom: 25px; color: #aeb9ab; font-size: 13px; line-height: 1.7; }
+    .objective-list { display: grid; gap: 9px; }
+    .objective {
+      display: grid;
+      min-height: 72px;
+      grid-template-columns: 37px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 13px;
+      padding: 12px 15px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #252d27;
+    }
+    .objective-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 8px; background: rgba(201,242,122,.09); color: var(--lime); }
+    .objective-icon.orange { background: rgba(242,164,111,.09); color: var(--orange); }
+    .objective-icon.blue { background: rgba(140,201,192,.09); color: var(--blue); }
+    .objective-icon svg { width: 17px; height: 17px; }
+    .objective h3 { margin: 0 0 3px; font-size: 12px; }
+    .objective p { margin: 0; color: #a3afa1; font-size: 11px; }
+    .reward { color: #d2e5b4; font: 10px var(--mono); white-space: nowrap; }
+    .objective-note { margin-top: 15px; padding: 13px 15px; border-left: 2px solid var(--orange); background: rgba(242,164,111,.06); color: #c5cbbf; font-size: 11px; line-height: 1.6; }
+
+    .studio-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(180px, .7fr); gap: 16px; }
+    .map-panel { padding: 17px; border: 1px solid var(--line); border-radius: 8px; background: #1b221d; }
+    .map-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+    .map-heading strong { font-size: 12px; }
+    .map-heading span { color: #8f9c8d; font: 9px var(--mono); }
+    .floor-map { display: grid; min-height: 250px; grid-template: repeat(4, 1fr) / repeat(5, 1fr); gap: 5px; }
+    .room { display: grid; min-height: 44px; place-items: center; padding: 5px; border: 1px solid rgba(221,237,213,.12); border-radius: 4px; background: #29342c; color: #aebba8; font: 9px var(--mono); text-align: center; }
+    .room.large { grid-column: span 2; grid-row: span 2; border-color: rgba(201,242,122,.36); background: rgba(201,242,122,.1); color: var(--lime); }
+    .room.stage { grid-column: span 2; background: rgba(242,164,111,.09); color: #f2b183; }
+    .room.corridor { background: #222b24; color: #7e8d7d; }
+    .map-aside { display: grid; align-content: start; gap: 9px; }
+    .map-stat { padding: 15px; border: 1px solid var(--line); border-radius: 7px; background: #252d27; }
+    .map-stat strong { display: block; margin: 7px 0 4px; color: #eaf0e4; font-size: 14px; }
+    .map-stat p { margin: 0; color: #9da99b; font-size: 10px; line-height: 1.5; }
+    .room-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .tag { padding: 5px 7px; border-color: var(--line); background: rgba(255,255,255,.035); color: #bdc8b9; font-size: 9px; }
+
+    .quota-board { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, .7fr); gap: 18px; }
+    .quota-list { display: grid; gap: 8px; }
+    .quota-row { display: grid; grid-template-columns: 67px 1fr auto; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 6px; background: #252d27; }
+    .quota-round { color: #a1ad9f; font: 10px var(--mono); }
+    .quota-bar { height: 6px; overflow: hidden; border-radius: 4px; background: #39433a; }
+    .quota-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #92be58, var(--lime)); }
+    .quota-value { color: #dce8d1; font: 11px var(--mono); }
+    .survival-note { padding: 18px; border: 1px solid rgba(242,164,111,.2); border-radius: 7px; background: rgba(242,164,111,.06); }
+    .survival-note .tile-icon { margin-bottom: 15px; }
+    .survival-note p { margin: 0; color: #b7bdb1; font-size: 11px; line-height: 1.65; }
+    .survival-note h3 { margin-bottom: 8px; }
+
+    .spectator-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(200px,.8fr); gap: 14px; }
+    .spectator-stage { position: relative; display: flex; min-height: 245px; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 19px; border: 1px solid rgba(140,201,192,.2); border-radius: 8px; background: linear-gradient(145deg, rgba(44,87,78,.5), rgba(30,40,33,.87) 66%), #1b221d; }
+    .spectator-stage::after { position: absolute; top: 48px; right: -20px; width: 180px; height: 150px; border: 1px solid rgba(140,201,192,.22); border-radius: 48%; box-shadow: 0 0 0 21px rgba(140,201,192,.035), 0 0 0 43px rgba(140,201,192,.025); content: ""; transform: rotate(-22deg); }
+    .live-label { display: inline-flex; align-items: center; gap: 7px; color: #b5e0d7; font: 10px var(--mono); text-transform: uppercase; }
+    .live-label::before { width: 7px; height: 7px; border-radius: 50%; background: #f2a46f; content: ""; box-shadow: 0 0 10px rgba(242,164,111,.6); }
+    .spectator-stage h2 { position: relative; z-index: 1; max-width: 280px; margin: 0; font-size: 25px; line-height: 1.08; }
+    .spectator-stage h2 span { color: #9dd4c9; }
+    .spectator-side { display: grid; align-content: start; gap: 9px; }
+    .spectator-step { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 13px; border: 1px solid var(--line); border-radius: 7px; background: #252d27; }
+    .step-number { display: grid; width: 24px; height: 24px; place-items: center; border-radius: 6px; background: rgba(140,201,192,.1); color: var(--blue); font: 10px var(--mono); }
+    .spectator-step h3 { margin: 1px 0 4px; font-size: 11px; }
+    .spectator-step p { margin: 0; color: #9eaa9b; font-size: 10px; line-height: 1.5; }
+
+    .dock-wrap { position: relative; z-index: 8; display: flex; height: 67px; flex: 0 0 67px; align-items: flex-start; justify-content: center; padding-top: 7px; pointer-events: none; }
+    .dock {
+      display: flex;
+      min-height: 51px;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 9px;
+      border: 1px solid rgba(242,247,236,.12);
+      border-radius: 11px;
+      background: rgba(20,26,22,.82);
+      box-shadow: 0 12px 40px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.055);
+      backdrop-filter: blur(20px);
+      pointer-events: auto;
+    }
+    .dock-item { position: relative; display: grid; width: 39px; height: 39px; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #dce7d9; transition: transform .15s ease, background .15s ease; }
+    .dock-item:hover { transform: translateY(-3px); background: rgba(255,255,255,.08); }
+    .dock-item[aria-current="page"]::after { position: absolute; bottom: -4px; left: 50%; width: 4px; height: 4px; border-radius: 50%; background: var(--lime); content: ""; transform: translateX(-50%); }
+    .dock-separator { width: 1px; height: 27px; margin: 0 4px; background: rgba(255,255,255,.13); }
+    .dock-item.launcher { color: var(--lime); }
+
+    .launcher-menu {
+      position: absolute;
+      z-index: 12;
+      top: 48px;
+      left: 12px;
+      width: 285px;
+      padding: 12px;
+      border: 1px solid rgba(240,245,235,.13);
+      border-radius: 10px;
+      background: rgba(29,36,31,.97);
+      box-shadow: 0 18px 55px rgba(0,0,0,.43);
+      backdrop-filter: blur(20px);
+    }
+    .launcher-menu[hidden] { display: none; }
+    .launcher-heading { display: flex; align-items: center; gap: 10px; padding: 7px 7px 14px; border-bottom: 1px solid var(--line); }
+    .launcher-heading strong { display: block; font-size: 12px; }
+    .launcher-heading small { color: #99a596; font: 9px var(--mono); }
+    .menu-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding-top: 9px; }
+    .menu-item { display: flex; align-items: center; gap: 8px; min-height: 43px; padding: 5px 7px; border: 0; border-radius: 6px; background: transparent; color: #d4ded1; text-align: left; font-size: 11px; }
+    .menu-item:hover { background: rgba(255,255,255,.08); }
+    .menu-item .app-glyph { width: 28px; height: 28px; border-radius: 8px; }
+    .menu-item .app-glyph svg { width: 15px; height: 15px; }
+
+    .toast { position: absolute; z-index: 15; right: 20px; bottom: 82px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 7px; background: #28322a; box-shadow: 0 10px 30px rgba(0,0,0,.3); color: #dbe4d5; font-size: 11px; opacity: 0; pointer-events: none; transform: translateY(5px); transition: opacity .2s ease, transform .2s ease; }
+    .toast.is-visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes window-arrive { from { opacity: 0; transform: translate(-50%, -47%) scale(.985); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+    @keyframes view-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 
     @media (max-width: 760px) {
-      .frame { width: 100%; min-height: 100svh; margin: 84px 0 0; padding: 0 18px; border-inline: 0; }
-      .topbar { grid-template-columns: 1fr 1fr; gap: 4px 12px; min-height: 72px; padding: 8px 18px; }
-      .status-progress { justify-self: end; }
-      .status-copyright { grid-column: 1 / -1; justify-self: start; }
-      main { min-height: calc(100svh - 156px); grid-template-columns: 1fr; align-content: center; gap: 42px; padding: 12vh 0 9vh; }
-      .eyebrow { margin-bottom: 22px; }
-      .summary { max-width: 310px; margin-top: 27px; }
-      .readout { justify-self: start; width: min(100%, 310px); }
-      .briefing { padding: 75px 0 90px; }
-      .briefing-head, .modes { grid-template-columns: 1fr; gap: 30px; }
-      .briefing-grid { grid-template-columns: 1fr; }
-      .footer { gap: 16px; }
+      body { overflow: hidden; }
+      .system-bar { height: 40px; flex-basis: 40px; padding: 0 11px; }
+      .bar-left { gap: 4px; }
+      .bar-right { gap: 7px; }
+      .tray { gap: 0; }
+      .desktop-icons { top: auto; right: 12px; bottom: 74px; left: 12px; display: flex; width: auto; justify-content: center; gap: 8px; }
+      .desktop-icon { min-height: 61px; padding: 4px; }
+      .desktop-icon .app-glyph { width: 34px; height: 34px; }
+      .desktop-icon span:last-child { max-width: 65px; font-size: 9px; }
+      .app-window { top: 8px; right: 9px; bottom: 74px; left: 9px; width: auto; height: auto; min-height: 0; border-radius: 9px; transform: none; }
+      .app-window.is-maximized { top: 5px; right: 5px; bottom: 72px; left: 5px; }
+      .window-titlebar { height: 40px; flex-basis: 40px; padding-inline: 10px; }
+      .window-body { grid-template-columns: 52px minmax(0,1fr); }
+      .app-sidebar { align-items: center; padding: 12px 5px; }
+      .sidebar-label, .nav-item span, .sidebar-bottom { display: none; }
+      .app-nav { width: 100%; justify-items: center; gap: 6px; }
+      .nav-item { width: 39px; min-height: 39px; justify-content: center; padding: 0; }
+      .nav-item svg { width: 18px; height: 18px; }
+      .view { padding: 22px 18px; }
+      .view-heading { margin-bottom: 18px; }
+      .view-heading .build-pill { max-width: 112px; white-space: normal; line-height: 1.35; }
+      .overview-hero { grid-template-columns: 1fr; gap: 19px; }
+      .hero-visual { min-height: 170px; }
+      .feature-row { grid-template-columns: 1fr; gap: 8px; }
+      .feature-tile { display: grid; min-height: 83px; grid-template-columns: 34px 1fr; align-content: center; column-gap: 10px; padding: 12px; }
+      .tile-top { grid-row: span 2; align-self: center; margin: 0; }
+      .tile-index { display: none; }
+      .feature-tile h3 { margin: 0 0 3px; }
+      .feature-tile p { grid-column: 2; }
+      .overview-footer { align-items: flex-start; flex-direction: column; }
+      .studio-layout, .quota-board, .spectator-grid { grid-template-columns: 1fr; }
+      .floor-map { min-height: 205px; }
+      .map-aside { grid-template-columns: 1fr 1fr; }
+      .map-stat:last-child { grid-column: 1 / -1; }
+      .spectator-stage { min-height: 190px; }
+      .launcher-menu { top: 45px; left: 7px; }
     }
 
-    @media (max-width: 400px) {
-      .footer span:last-child { max-width: 110px; text-align: right; line-height: 1.6; }
-      .actions { gap: 13px; }
-      .status-progress { white-space: normal; text-align: right; }
+    @media (max-width: 420px) {
+      .bar-title { display: none; }
+      .bar-right { gap: 3px; font-size: 10px; }
+      .tray-button { width: 19px; }
+      .desktop-icons { gap: 2px; }
+      .desktop-icon { min-width: 61px; }
+      .view { padding: 20px 14px; }
+      .view-heading { gap: 8px; }
+      .build-pill { font-size: 9px; }
+      .objective { grid-template-columns: 31px minmax(0,1fr) auto; gap: 8px; padding: 10px; }
+      .objective-icon { width: 30px; height: 30px; }
+      .reward { font-size: 9px; }
+      .dock { gap: 2px; padding: 5px; }
+      .dock-item { width: 35px; height: 37px; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-      .js .reveal { opacity: 1; transform: none; }
+    .desktop {
+      color: var(--text);
+      background:
+        linear-gradient(133deg, transparent 0 47%, rgba(255,89,108,.055) 47.1% 47.35%, transparent 47.45%),
+        linear-gradient(133deg, transparent 0 57%, rgba(255,89,108,.04) 57.1% 57.3%, transparent 57.4%),
+        radial-gradient(ellipse at 69% 48%, rgba(120,35,54,.5), transparent 49%),
+        linear-gradient(120deg, #2a171c, #130b0e 72%);
     }
+    .desktop::before { border-color: rgba(255,89,108,.16); box-shadow: 0 0 0 48px rgba(255,89,108,.025), 0 0 0 98px rgba(255,89,108,.018); }
+    .desktop::after { background-image: radial-gradient(rgba(247,228,231,.22) .6px, transparent .6px); }
+    .system-bar { background: rgba(19,10,12,.84); }
+    .bar-app, .bar-right, .bar-button, .tray-button, .bar-title, .window-name, .window-control, .dock-item, .menu-item { color: #eadadd; }
+    .desktop-icon { color: #f4e9ea; }
+    .desktop-icon:hover, .desktop-icon:focus-visible { border-color: rgba(247,228,231,.2); background: rgba(255,89,108,.09); }
+    .app-glyph { background: linear-gradient(145deg, #65404a, #352127); color: #f5dfe2; }
+    .app-glyph.lime { background: linear-gradient(145deg, #ff8490, #d3394f); color: #350c12; }
+    .app-glyph.orange { background: linear-gradient(145deg, #e9858c, #ad4d5c); color: #390e15; }
+    .app-glyph.blue { background: linear-gradient(145deg, #bd7180, #783744); color: #ffe9ec; }
+    .app-window, .app-content { background: #26191d; }
+    .window-titlebar, .feature-tile, .objective, .map-stat, .quota-row, .spectator-step { background: #302126; }
+    .app-sidebar { background: #211519; }
+    .sidebar-label, .sidebar-bottom, .nav-item, .nav-item svg, .lead, .micro-label, .studio-caption, .window-label,
+    .tile-index, .feature-tile p, .player-note, .section-copy, .objective p, .reward, .objective-note,
+    .map-heading span, .room, .map-stat p, .tag, .quota-round, .quota-value, .survival-note p,
+    .spectator-step p, .launcher-heading small { color: #c2a8ac; }
+    .nav-item[aria-current="page"], .nav-item[aria-current="page"] svg { color: var(--lime); }
+    .nav-item[aria-current="page"] { background: rgba(255,89,108,.14); }
+    .hero-visual { border-color: rgba(247,228,231,.13); background: linear-gradient(rgba(247,228,231,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(247,228,231,.035) 1px, transparent 1px), radial-gradient(ellipse at 52% 58%, rgba(162,63,77,.24), transparent 57%), #24171b; }
+    .hero-visual::before, .hero-visual::after { border-color: rgba(255,89,108,.24); }
+    .studio-card { border-color: rgba(247,228,231,.24); background: rgba(54,32,39,.95); }
+    .studio-screen { border-color: rgba(255,89,108,.24); background: #2b1a20; }
+    .tile-icon, .objective-icon { background: rgba(255,89,108,.12); color: var(--lime); }
+    .tile-icon.orange, .objective-icon.orange { background: rgba(233,133,140,.12); color: var(--orange); }
+    .tile-icon.blue, .objective-icon.blue { background: rgba(189,113,128,.12); color: var(--blue); }
+    .primary-link { color: #350c12; }
+    .primary-link:hover { background: #ff8290; }
+    .objective-note { border-left-color: var(--orange); background: rgba(233,133,140,.07); }
+    .room { border-color: rgba(247,228,231,.13); background: #35252a; }
+    .room.large { border-color: rgba(255,89,108,.38); background: rgba(255,89,108,.12); color: var(--lime); }
+    .room.stage { background: rgba(233,133,140,.11); color: #efa0a5; }
+    .room.corridor { background: #2a1c21; color: #b29da1; }
+    .quota-bar { background: #49343a; }
+    .quota-bar span { background: linear-gradient(90deg, var(--blue), var(--lime)); }
+    .survival-note { border-color: rgba(233,133,140,.24); background: rgba(233,133,140,.07); }
+    .spectator-stage { border-color: rgba(189,113,128,.25); background: linear-gradient(145deg, rgba(112,43,58,.55), rgba(43,27,33,.9) 66%), #24171b; }
+    .spectator-stage::after { border-color: rgba(189,113,128,.25); box-shadow: 0 0 0 21px rgba(189,113,128,.04), 0 0 0 43px rgba(189,113,128,.025); }
+    .live-label, .spectator-stage h2 span { color: #e9a0a8; }
+    .live-label::before { background: var(--orange); box-shadow: 0 0 10px rgba(233,133,140,.6); }
+    .step-number { background: rgba(189,113,128,.13); color: var(--blue); }
+    .dock, .launcher-menu { background-color: rgba(35,20,25,.94); }
+    .dock-item.launcher { color: var(--lime); }
+    .toast { background: #38252b; color: #ead9dc; }
+
+    :is(.bar-button, .tray-button, .app-glyph, .nav-item, .tile-icon, .objective-icon, .dock-item, .window-control):has(use)::before {
+      display: block;
+      font: 9px/1 var(--mono);
+      letter-spacing: 0;
+      text-align: center;
+    }
+    :is(.bar-button, .dock-item, .app-glyph):has(use[href="#icon-grid"])::before { content: "[+]"; }
+    :is(.app-glyph, .nav-item, .tile-icon, .objective-icon, .dock-item):has(use[href="#icon-game"])::before { content: "DLT"; }
+    :is(.app-glyph, .nav-item, .tile-icon, .objective-icon, .dock-item):has(use[href="#icon-target"])::before { content: "AIM"; }
+    :is(.app-glyph, .nav-item, .tile-icon, .objective-icon, .dock-item):has(use[href="#icon-map"])::before { content: "MAP"; }
+    :is(.app-glyph, .nav-item, .tile-icon, .objective-icon, .dock-item):has(use[href="#icon-eye"])::before { content: "CAM"; }
+    :is(.tile-icon, .objective-icon):has(use[href="#icon-people"])::before { content: "USR"; }
+    :is(.tile-icon, .objective-icon):has(use[href="#icon-box"])::before { content: "BOX"; }
+    :is(.tile-icon, .objective-icon):has(use[href="#icon-bolt"])::before { content: "!!!"; }
+    :is(.tile-icon, .objective-icon):has(use[href="#icon-handshake"])::before { content: "DEAL"; font-size: 8px; }
+    :is(.tile-icon, .objective-icon):has(use[href="#icon-spark"])::before { content: "???"; }
+    .tray-button:has(use[href="#icon-signal"])::before { content: "NET"; font-size: 8px; }
+    .tray-button:has(use[href="#icon-volume"])::before { content: "VOL"; font-size: 8px; }
+    .tray-button:has(use[href="#icon-power"])::before { content: "PWR"; font-size: 8px; }
+    .window-control:has(use[href="#icon-minimize"])::before { content: "_"; }
+    .window-control:has(use[href="#icon-maximize"])::before { content: "[]"; }
+    .window-control:has(use[href="#icon-close"])::before { content: "X"; }
+    .primary-link:has(use[href="#icon-arrow"])::after, .quiet-link:has(use[href="#icon-arrow"])::after { content: " ->"; font: 10px var(--mono); }
+    .bar-button, .tray-button, .app-glyph, .tile-icon, .objective-icon, .dock-item, .window-control { font-family: var(--mono); }
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="frame">
-      <header class="topbar" aria-label="Game status">
-        <span class="status-item status-time">time: <time id="clock">--:--:--</time><span class="sleep-message" id="sleep-message" hidden>Go to sleep dude</span></span>
-        <span class="status-item status-progress" data-game-progress>game progress: in development</span>
-        <span class="status-item status-copyright">© DON'T LET THEM KNOW / FLATERIC0</span>
-      </header>
+  <svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden">
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.4"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.4"/></symbol>
+    <symbol id="icon-game" viewBox="0 0 24 24"><path d="M7.2 8h9.6a4 4 0 0 1 3.8 2.8l1.1 3.6a2.7 2.7 0 0 1-4.4 2.8l-2-1.7H8.7l-2 1.7a2.7 2.7 0 0 1-4.4-2.8l1.1-3.6A4 4 0 0 1 7.2 8Z"/><path d="M7 11v4m-2-2h4m8-.5h.01M18 14.5h.01"/></symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="m12 12 6-6m-1-2 3 3"/></symbol>
+    <symbol id="icon-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15m6-12v15"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><path d="M16 20v-1.7a3.3 3.3 0 0 0-3.3-3.3H6.3A3.3 3.3 0 0 0 3 18.3V20m6-8a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm6-6.8a3.5 3.5 0 0 1 0 6.6m3 3.2h.7a3.3 3.3 0 0 1 3.3 3.3V20"/></symbol>
+    <symbol id="icon-box" viewBox="0 0 24 24"><path d="m12 3 9 4.5v9L12 21l-9-4.5v-9L12 3Z"/><path d="m3.5 7.8 8.5 4.4 8.5-4.4M12 12.2V21m-4.5-15 9 4.6"/></symbol>
+    <symbol id="icon-bolt" viewBox="0 0 24 24"><path d="M13.2 2.8 5 13h6l-.3 8.2L19 11h-6l.2-8.2Z"/></symbol>
+    <symbol id="icon-handshake" viewBox="0 0 24 24"><path d="m4 12 4.3-4.2a2 2 0 0 1 2.8 0l1 1a2 2 0 0 0 2.8 0l.6-.6 4.5 4.5-5.2 5.2a2 2 0 0 1-2.8 0l-4-4m-4.8-6L2 10l3.5 3.5 3-3L5 7.5Zm15 0 2 2.5-3.5 3.5-3-3 4.5-3Z"/><path d="m10 15 2 2m1-4 2 2m1-4 2 2"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="icon-window" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9h17m-13-2h.01m3 0h.01"/></symbol>
+    <symbol id="icon-signal" viewBox="0 0 24 24"><path d="M3 9a14 14 0 0 1 18 0m-15 4a9 9 0 0 1 12 0m-9 4a4 4 0 0 1 6 0m-3 3h.01"/></symbol>
+    <symbol id="icon-volume" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4H4Zm12-2a6 6 0 0 1 0 8m2.5-10.5a10 10 0 0 1 0 13"/></symbol>
+    <symbol id="icon-power" viewBox="0 0 24 24"><path d="M12 2.5v9m-5.7-5a8 8 0 1 0 11.4 0"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-minimize" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="icon-maximize" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1.5"/></symbol>
+    <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8L12 2Z"/></symbol>
+  </svg>
 
-      <main id="top">
-        <section class="hero-copy" id="game" aria-labelledby="title">
-          <p class="eyebrow">./launch_game --social-chaos</p>
-          <h1 id="title" aria-label="Don't let them know">
-            <pre class="ascii-logo" aria-hidden="true">####    ###   #   #  #####
-#   #  #   #  ##  #    #
-#   #  #   #  # # #    #
-#   #  #   #  #  ##    #
-####    ###   #   #    #
-
-#      #####  #####
-#      #        #
-#      ####     #
-#      #        #
-#####  #####    #
-
-#####  #   #  #####  #   #
-  #    #   #  #      ## ##
-  #    #####  ####   # # #
-  #    #   #  #      #   #
-  #    #   #  #####  #   #
-
-#   #  #   #   ###   #   #
-#  #   ##  #  #   #  #   #
-###    # # #  #   #  # # #
-#  #   #  ##  #   #  ## ##
-#   #  #   #   ###   #   #</pre></h1>
-          <p class="summary">4–10 players. Different objectives. One impossible quota. Cooperate, deceive, and improvise your way through a game where nobody knows what anyone else was told.</p>
-          <div class="actions">
-            <button class="open-file" id="open-file" type="button">&gt; discover_game <span aria-hidden="true">_</span></button>
-            <a class="install-link" href="https://flateric0.itch.io/dltk">&gt; Install_onto_drive</a>
-            <span class="action-note"># 4–10 players</span>
-          </div>
-        </section>
-
-        <aside class="readout" id="signal" aria-label="Signal status">
-          <div class="readout-label">$ cat premise.txt</div>
-          <div class="readout-value">trust nobody / everything counts</div>
-          <p>Every round gives the group a quota. Reach it together before time runs out—or watch the failures get eliminated.</p>
-        </aside>
-      </main>
-
-      <section class="briefing" id="briefing" aria-labelledby="briefing-title">
-        <div class="briefing-head reveal">
-          <div>
-            <p class="section-kicker">$ ./briefing --overview</p>
-            <h2 id="briefing-title">Everyone has<br>a secret.</h2>
-          </div>
-          <p class="briefing-intro">DON'T LET THEM KNOW is a social sandbox where your private objectives collide with the group's survival. There is no single right way to play.</p>
+  <div class="desktop">
+    <header class="system-bar">
+      <div class="bar-left">
+        <button class="bar-button" id="activities-button" type="button" aria-label="Open applications" aria-expanded="false" aria-controls="launcher-menu"><svg><use href="#icon-grid"/></svg></button>
+        <span class="bar-app"><span class="bar-brand">d.</span><span class="bar-title">DLTK Desktop</span></span>
+      </div>
+      <div class="bar-clock" id="clock" aria-label="Local time">--:--</div>
+      <div class="bar-right">
+        <div class="tray" aria-label="System status">
+          <button class="tray-button" type="button" aria-label="Network connected" data-toast="Network connected"><svg><use href="#icon-signal"/></svg></button>
+          <button class="tray-button" type="button" aria-label="Sound enabled" data-toast="Sound is enabled"><svg><use href="#icon-volume"/></svg></button>
+          <button class="tray-button" type="button" aria-label="Power status" data-toast="Power status: ready"><svg><use href="#icon-power"/></svg></button>
         </div>
+        <span>EN</span>
+      </div>
+    </header>
 
-        <div class="briefing-grid reveal">
-          <article class="briefing-card reveal">
-            <strong>01 / Hit the quota</strong>
-            <h3>One goal.<br>Many agendas.</h3>
-            <p>Earn points by completing challenges, delivering items, operating machines, finding valuable objects, taking risks, and helping other players. The quota rises every round.</p>
-          </article>
-          <article class="briefing-card reveal">
-            <strong>02 / Play your part</strong>
-            <h3>Lie. Deal.<br>Betray.</h3>
-            <p>Your private objectives might ask you to cooperate, deceive, steal, sabotage, or do something wonderfully suspicious. No one sees your rules but you.</p>
-          </article>
-          <article class="briefing-card reveal">
-            <strong>03 / Survive the round</strong>
-            <h3>Miss the mark.<br>You're out.</h3>
-            <p>When the quota fails, players who failed the required conditions are eliminated and sent into spectator mode. The player count keeps changing until only the most adaptable remain.</p>
-          </article>
-        </div>
+    <aside class="launcher-menu" id="launcher-menu" hidden aria-label="Applications">
+      <div class="launcher-heading"><span class="app-glyph lime"><svg><use href="#icon-grid"/></svg></span><span><strong>DLTK Desktop</strong><small>Applications</small></span></div>
+      <div class="menu-apps">
+        <button class="menu-item" type="button" data-open="home"><span class="app-glyph lime"><svg><use href="#icon-game"/></svg></span>Game overview</button>
+        <button class="menu-item" type="button" data-open="objectives"><span class="app-glyph orange"><svg><use href="#icon-target"/></svg></span>Objectives</button>
+        <button class="menu-item" type="button" data-open="studio"><span class="app-glyph blue"><svg><use href="#icon-map"/></svg></span>Studio map</button>
+        <button class="menu-item" type="button" data-open="spectators"><span class="app-glyph"><svg><use href="#icon-eye"/></svg></span>Spectator mode</button>
+      </div>
+    </aside>
 
-        <div class="modes reveal">
-          <div class="reveal">
-            <h3>$ environment --interactive</h3>
-            <p>Explore a giant television studio packed with interactive props, backstage corridors, control rooms, vents, machinery, and restricted areas. Push furniture, hide objects, block entrances—and adapt when blackouts, lockdowns, low gravity, or system errors change the rules.</p>
+    <main class="work-area" aria-label="Desktop workspace">
+      <nav class="desktop-icons" aria-label="Desktop apps">
+        <button class="desktop-icon" type="button" data-open="home"><span class="app-glyph lime"><svg><use href="#icon-game"/></svg></span><span>Game overview</span></button>
+        <button class="desktop-icon" type="button" data-open="objectives"><span class="app-glyph orange"><svg><use href="#icon-target"/></svg></span><span>Secret objectives</span></button>
+        <button class="desktop-icon" type="button" data-open="studio"><span class="app-glyph blue"><svg><use href="#icon-map"/></svg></span><span>Studio map</span></button>
+        <button class="desktop-icon" type="button" data-open="spectators"><span class="app-glyph"><svg><use href="#icon-eye"/></svg></span><span>Spectator mode</span></button>
+      </nav>
+
+      <section class="app-window" id="app-window" aria-label="Don't Let Them Know game information">
+        <header class="window-titlebar" id="window-titlebar">
+          <div class="window-name"><span class="app-glyph lime"><svg><use href="#icon-game"/></svg></span><span>DON'T LET THEM KNOW</span></div>
+          <div class="window-controls">
+            <button class="window-control" id="minimize-window" type="button" aria-label="Minimize window"><svg><use href="#icon-minimize"/></svg></button>
+            <button class="window-control" id="maximize-window" type="button" aria-label="Maximize window"><svg><use href="#icon-maximize"/></svg></button>
+            <button class="window-control close" id="close-window" type="button" aria-label="Close window"><svg><use href="#icon-close"/></svg></button>
           </div>
-          <div class="reveal">
-            <h3>$ spectator_mode --stay_connected</h3>
-            <p>Spectator mode keeps you in the action. Follow living players, switch between cameras, explore spectator-only spaces, and watch the chaos unfold. You are out of the round—but not out of the story.</p>
+        </header>
+
+        <div class="window-body">
+          <aside class="app-sidebar" aria-label="Game pages">
+            <p class="sidebar-label">Game files</p>
+            <nav class="app-nav">
+              <button class="nav-item" type="button" data-open="home" aria-current="page"><svg><use href="#icon-game"/></svg><span>Overview</span></button>
+              <button class="nav-item" type="button" data-open="objectives"><svg><use href="#icon-target"/></svg><span>Objectives</span></button>
+              <button class="nav-item" type="button" data-open="studio"><svg><use href="#icon-map"/></svg><span>Studio map</span></button>
+              <button class="nav-item" type="button" data-open="survival"><svg><use href="#icon-bolt"/></svg><span>Quotas</span></button>
+              <button class="nav-item" type="button" data-open="spectators"><svg><use href="#icon-eye"/></svg><span>Spectators</span></button>
+            </nav>
+            <div class="sidebar-bottom">SYSTEM STATUS<br><span>●</span> signal steady</div>
+          </aside>
+
+          <div class="app-content" id="app-content">
+            <section class="view is-active" id="view-home" data-view="home" aria-labelledby="home-title">
+              <div class="view-heading"><div><p class="eyebrow">A multiplayer game about reading the room</p><h1 id="home-title">DON'T LET<br>THEM <span>KNOW.</span></h1><p class="lead">Everyone has a different plan. You still have to hit the quota together.</p></div><span class="build-pill">IN DEVELOPMENT</span></div>
+              <div class="overview-hero">
+                <div><p class="micro-label">One room. Ten agendas.</p><p class="section-copy">Make a deal, deliver the crates, sabotage a machine, or quietly finish your own objective. Just don't let the group fall short.</p><a class="primary-link" href="https://flateric0.itch.io/dltk" target="_blank" rel="noreferrer">Visit the game page <svg><use href="#icon-arrow"/></svg></a></div>
+                <div class="hero-visual" aria-label="Illustration of a game-show studio screen"><div class="studio-card"><div class="studio-screen">QUOTA: 500</div><div class="studio-caption"><span>broadcast studio / 01</span><span>● live</span></div></div><span class="window-label">STUDIO FEED 01</span></div>
+              </div>
+              <div class="feature-row">
+                <article class="feature-tile"><div class="tile-top"><span class="tile-icon"><svg><use href="#icon-people"/></svg></span><span class="tile-index">01</span></div><h3>4–10 players</h3><p>Start together. The roster can shrink.</p></article>
+                <article class="feature-tile"><div class="tile-top"><span class="tile-icon orange"><svg><use href="#icon-target"/></svg></span><span class="tile-index">02</span></div><h3>Private objectives</h3><p>Your real goal stays yours alone.</p></article>
+                <article class="feature-tile"><div class="tile-top"><span class="tile-icon blue"><svg><use href="#icon-handshake"/></svg></span><span class="tile-index">03</span></div><h3>Shared survival</h3><p>Reach the quota before the clock runs out.</p></article>
+              </div>
+              <div class="overview-footer"><span class="player-note">CURRENT BUILD <strong>◆ IN PROGRESS</strong></span><button class="quiet-link nav-jump" type="button" data-open="objectives">Peek at an objective <svg><use href="#icon-arrow"/></svg></button></div>
+            </section>
+
+            <section class="view" id="view-objectives" data-view="objectives" aria-labelledby="objectives-title">
+              <div class="view-heading"><div><p class="eyebrow">Personal task file / visibility: private</p><h2 id="objectives-title">Your plan is yours.</h2></div><span class="build-pill">EXAMPLE FILES</span></div>
+              <p class="section-copy">Every player gets their own instructions. Some help the team; others might make everyone wonder what you're up to.</p>
+              <div class="objective-list">
+                <article class="objective"><span class="objective-icon"><svg><use href="#icon-box"/></svg></span><div><h3>Move the shipment</h3><p>Deliver 3 crates to the loading bay.</p></div><span class="reward">+150 PTS</span></article>
+                <article class="objective"><span class="objective-icon blue"><svg><use href="#icon-people"/></svg></span><div><h3>Get a little help</h3><p>Convince another player to activate the machine.</p></div><span class="reward">+75 PTS</span></article>
+                <article class="objective"><span class="objective-icon orange"><svg><use href="#icon-spark"/></svg></span><div><h3>Cause a distraction</h3><p>Make three machines malfunction.</p></div><span class="reward">CLASSIFIED</span></article>
+                <article class="objective"><span class="objective-icon"><svg><use href="#icon-eye"/></svg></span><div><h3>Keep it subtle</h3><p>Take something valuable without getting caught.</p></div><span class="reward">+200 PTS</span></article>
+              </div>
+              <div class="objective-note">Other players can talk about their task. Nothing says they have to be telling the truth.</div>
+            </section>
+
+            <section class="view" id="view-studio" data-view="studio" aria-labelledby="studio-title">
+              <div class="view-heading"><div><p class="eyebrow">Location data / broadcast district</p><h2 id="studio-title">The whole set is in play.</h2></div><span class="build-pill">INTERACTIVE SPACE</span></div>
+              <p class="section-copy">Explore a sprawling television studio. Props move, doors get blocked, and the room never stays predictable for long.</p>
+              <div class="studio-layout">
+                <div class="map-panel"><div class="map-heading"><strong>Studio floor / schematic</strong><span>SECTOR 04</span></div><div class="floor-map" role="img" aria-label="Schematic map with main stage, control booth, storage, loading bay, backstage, and corridors"><div class="room large">MAIN<br>STAGE</div><div class="room">CONTROL<br>BOOTH</div><div class="room">GREEN<br>ROOM</div><div class="room stage">BACKSTAGE</div><div class="room corridor">HALL</div><div class="room">STORAGE</div><div class="room">LOADING<br>BAY</div><div class="room corridor">VENTS</div><div class="room">MACHINE<br>ROOM</div><div class="room corridor">HALL</div></div></div>
+                <div class="map-aside"><article class="map-stat"><span class="micro-label">Your environment</span><strong>Built to be messed with</strong><p>Push furniture. Hide items. Turn a clear route into a problem.</p></article><article class="map-stat"><span class="micro-label">Things can change</span><div class="room-list"><span class="tag">blackouts</span><span class="tag">lockdowns</span><span class="tag">low gravity</span><span class="tag">system errors</span></div></article></div>
+              </div>
+            </section>
+
+            <section class="view" id="view-survival" data-view="survival" aria-labelledby="survival-title">
+              <div class="view-heading"><div><p class="eyebrow">Round status / shared objective</p><h2 id="survival-title">The quota keeps climbing.</h2></div><span class="build-pill">NO ONE COASTS</span></div>
+              <p class="section-copy">Earn points by exploring, helping, delivering, operating machines, and completing challenges. Every successful round raises the bar.</p>
+              <div class="quota-board"><div class="quota-list"><div class="quota-row"><span class="quota-round">ROUND 01</span><div class="quota-bar"><span style="width:24%"></span></div><span class="quota-value">500</span></div><div class="quota-row"><span class="quota-round">ROUND 02</span><div class="quota-bar"><span style="width:38%"></span></div><span class="quota-value">750</span></div><div class="quota-row"><span class="quota-round">ROUND 03</span><div class="quota-bar"><span style="width:56%"></span></div><span class="quota-value">1,100</span></div><div class="quota-row"><span class="quota-round">ROUND 04</span><div class="quota-bar"><span style="width:76%"></span></div><span class="quota-value">1,600</span></div><div class="quota-row"><span class="quota-round">ROUND 05</span><div class="quota-bar"><span style="width:100%"></span></div><span class="quota-value">2,400</span></div></div><aside class="survival-note"><span class="tile-icon orange"><svg><use href="#icon-bolt"/></svg></span><h3>Miss the mark?</h3><p>When time runs out, the quota is checked. Players who fail the required conditions are eliminated and sent to spectator mode. The game keeps going without them.</p></aside></div>
+            </section>
+
+            <section class="view" id="view-spectators" data-view="spectators" aria-labelledby="spectators-title">
+              <div class="view-heading"><div><p class="eyebrow">Out of the round / still in the story</p><h2 id="spectators-title">Getting eliminated isn't game over.</h2></div><span class="build-pill">SPECTATOR MODE</span></div>
+              <p class="section-copy">The player count changes as rounds go by. If your run ends, stick around and watch the remaining players try to survive.</p>
+              <div class="spectator-grid"><div class="spectator-stage"><span class="live-label">Watching the remaining players</span><h2>Missed the quota.<br><span>Stay for the chaos.</span></h2></div><div class="spectator-side"><article class="spectator-step"><span class="step-number">01</span><div><h3>Follow the survivors</h3><p>Keep up with whoever's still in the round.</p></div></article><article class="spectator-step"><span class="step-number">02</span><div><h3>Switch camera views</h3><p>Pick a better angle on the unfolding plan.</p></div></article><article class="spectator-step"><span class="step-number">03</span><div><h3>Keep watching</h3><p>Explore spectator-only spaces between rounds.</p></div></article></div></div>
+            </section>
           </div>
         </div>
       </section>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
 
-      <footer class="footer">
-        <span>DONT LET THEM KNOW <span aria-hidden="true">&copy;</span> <span id="year"></span></span>
-        <a href="#briefing">$ see_how_it_works</a>
-        <span data-game-progress>game progress: in development</span>
-      </footer>
-      <div class="copyright">© DON'T LET THEM KNOW / FLATERIC0</div>
-    </div>
+    <footer class="dock-wrap" aria-label="Application dock">
+      <nav class="dock">
+        <button class="dock-item launcher" id="dock-launcher" type="button" aria-label="Applications" aria-expanded="false"><svg><use href="#icon-grid"/></svg></button>
+        <span class="dock-separator" aria-hidden="true"></span>
+        <button class="dock-item" type="button" data-open="home" aria-label="Game overview" aria-current="page"><svg><use href="#icon-game"/></svg></button>
+        <button class="dock-item" type="button" data-open="objectives" aria-label="Secret objectives"><svg><use href="#icon-target"/></svg></button>
+        <button class="dock-item" type="button" data-open="studio" aria-label="Studio map"><svg><use href="#icon-map"/></svg></button>
+        <button class="dock-item" type="button" data-open="spectators" aria-label="Spectator mode"><svg><use href="#icon-eye"/></svg></button>
+      </nav>
+    </footer>
   </div>
 
-  <dialog id="case-file" aria-labelledby="file-title">
-    <div class="file-content">
-      <div class="file-top"><span>DON'T LET THEM KNOW</span><span class="file-stamp">Coming soon</span></div>
-      <h2 id="file-title">Bring your friends.</h2>
-      <p>Get ready for a social-chaos game where every player has a different plan. Wishlist, follow, and stay tuned for the first transmission.</p>
-      <button class="dismiss" id="close-file" type="button">Back to the site <span aria-hidden="true">x</span></button>
-    </div>
-  </dialog>
-
   <script>
-    const caseFile = document.querySelector("#case-file");
-    const openFile = document.querySelector("#open-file");
-    const closeFile = document.querySelector("#close-file");
+    const appWindow = document.querySelector("#app-window");
+    const launcherMenu = document.querySelector("#launcher-menu");
+    const activitiesButton = document.querySelector("#activities-button");
+    const dockLauncher = document.querySelector("#dock-launcher");
+    const toast = document.querySelector("#toast");
+    let toastTimer;
 
-    document.querySelector("#year").textContent = new Date().getFullYear();
-    const clock = document.querySelector("#clock");
-    const sleepMessage = document.querySelector("#sleep-message");
-    const updateClock = () => {
-      const now = new Date();
-      clock.textContent = new Intl.DateTimeFormat(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-      }).format(now);
-      sleepMessage.hidden = now.getHours() >= 6;
-    };
-    updateClock();
-    window.setInterval(updateClock, 1000);
-    openFile.addEventListener("click", () => caseFile.showModal());
-    closeFile.addEventListener("click", () => caseFile.close());
-    caseFile.addEventListener("click", (event) => {
-      if (event.target === caseFile) caseFile.close();
+    function setLauncher(open) {
+      launcherMenu.hidden = !open;
+      activitiesButton.setAttribute("aria-expanded", String(open));
+      dockLauncher.setAttribute("aria-expanded", String(open));
+    }
+
+    function openView(viewName) {
+      const view = document.querySelector(`[data-view="${viewName}"]`);
+      if (!view) return;
+      appWindow.classList.remove("is-hidden");
+      document.querySelectorAll(".view").forEach((item) => item.classList.toggle("is-active", item === view));
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        if (item.dataset.open === viewName) item.setAttribute("aria-current", "page");
+        else item.removeAttribute("aria-current");
+      });
+      document.querySelectorAll(".dock-item[data-open]").forEach((item) => {
+        if (item.dataset.open === viewName) item.setAttribute("aria-current", "page");
+        else item.removeAttribute("aria-current");
+      });
+      setLauncher(false);
+    }
+
+    document.querySelectorAll("[data-open]").forEach((button) => {
+      button.addEventListener("click", () => openView(button.dataset.open));
     });
 
-    const revealItems = document.querySelectorAll(".reveal");
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      });
-    }, { threshold: 0.12 });
+    activitiesButton.addEventListener("click", () => setLauncher(launcherMenu.hidden));
+    dockLauncher.addEventListener("click", () => setLauncher(launcherMenu.hidden));
+    document.addEventListener("click", (event) => {
+      if (!launcherMenu.contains(event.target) && !activitiesButton.contains(event.target) && !dockLauncher.contains(event.target)) setLauncher(false);
+    });
 
-    revealItems.forEach((item) => revealObserver.observe(item));
+    document.querySelector("#close-window").addEventListener("click", () => appWindow.classList.add("is-hidden"));
+    document.querySelector("#minimize-window").addEventListener("click", () => appWindow.classList.add("is-hidden"));
+    document.querySelector("#maximize-window").addEventListener("click", (event) => {
+      appWindow.classList.toggle("is-maximized");
+      event.currentTarget.setAttribute("aria-label", appWindow.classList.contains("is-maximized") ? "Restore window" : "Maximize window");
+      appWindow.style.left = "";
+      appWindow.style.top = "";
+    });
+
+    const titlebar = document.querySelector("#window-titlebar");
+    titlebar.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button") || window.innerWidth <= 760 || appWindow.classList.contains("is-maximized")) return;
+      const rect = appWindow.getBoundingClientRect();
+      const offsetX = event.clientX - rect.left;
+      const offsetY = event.clientY - rect.top;
+      titlebar.setPointerCapture(event.pointerId);
+      appWindow.style.left = `${rect.left}px`;
+      appWindow.style.top = `${rect.top}px`;
+      appWindow.style.transform = "none";
+      const moveWindow = (moveEvent) => {
+        const left = Math.max(0, Math.min(window.innerWidth - appWindow.offsetWidth, moveEvent.clientX - offsetX));
+        const top = Math.max(42, Math.min(window.innerHeight - 100, moveEvent.clientY - offsetY));
+        appWindow.style.left = `${left}px`;
+        appWindow.style.top = `${top}px`;
+      };
+      const stopMoving = () => {
+        titlebar.removeEventListener("pointermove", moveWindow);
+        titlebar.removeEventListener("pointerup", stopMoving);
+        titlebar.removeEventListener("pointercancel", stopMoving);
+      };
+      titlebar.addEventListener("pointermove", moveWindow);
+      titlebar.addEventListener("pointerup", stopMoving);
+      titlebar.addEventListener("pointercancel", stopMoving);
+    });
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("is-visible");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 1800);
+    }
+    document.querySelectorAll("[data-toast]").forEach((button) => button.addEventListener("click", () => showToast(button.dataset.toast)));
+
+    function updateClock() {
+      document.querySelector("#clock").textContent = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date());
+    }
+    updateClock();
+    window.setInterval(updateClock, 30000);
   </script>
 </body>
 </html>
